@@ -23,6 +23,7 @@ export async function searchRecipes(query: string, filters: any): Promise<Recipe
     }
 
     const data = await response.json()
+    console.log("API Response Data:", data); // Log the entire response
 
     const recipes: Recipe[] = data.results.map((recipe: any) => ({
       id: recipe.id,
@@ -35,7 +36,7 @@ export async function searchRecipes(query: string, filters: any): Promise<Recipe
       diets: recipe.diets || [],
       ingredients: recipe.extendedIngredients?.map((ingredient: any) => ingredient.original) || [],
     }))
-
+    // console.log("Mapped Recipes:", recipes)
     // Now apply same filters as before
     return recipes.filter((recipe) => {
       const matchesQuery = !query || recipe.title.toLowerCase().includes(query.toLowerCase())
