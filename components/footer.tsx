@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Mic } from "lucide-react"
+import { Mic, Github, Linkedin } from "lucide-react"
 
 export default function Footer() {
   return (
@@ -50,17 +50,24 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-8 border-t pt-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <p className="text-xs text-muted-foreground">© 2023 VoiceCook. All rights reserved.</p>
+          <p className="text-xs text-muted-foreground">© 2025 VoiceCook. All rights reserved.</p>
           <div className="flex gap-4">
-            <Link href="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-              Twitter
-            </Link>
-            <Link href="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-              Instagram
-            </Link>
-            <Link href="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-              GitHub
-            </Link>
+          <Link
+            href="https://github.com/jayrajsinghrathore"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs hover:text-primary transition-colors"
+          >
+            <Github className="h-4 w-4" />
+          </Link>
+          <Link
+            href="https://www.linkedin.com/in/jayraj-singh-rathore-786b13217/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs hover:text-primary transition-colors"
+          >
+            <Linkedin className="h-4 w-4" />
+          </Link>
           </div>
         </div>
       </div>
