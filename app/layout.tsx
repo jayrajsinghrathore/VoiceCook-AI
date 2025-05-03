@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata = {
   title: "VoiceCook - Voice Controlled Cooking Assistant",
   description: "A voice-controlled cooking assistant to find and save recipes",
-    generator: 'v0.dev'
+    generator: 'Next.js'
 }
 
 export default function RootLayout({
