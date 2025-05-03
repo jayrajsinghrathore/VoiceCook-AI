@@ -38,18 +38,18 @@ export default function RecipeSearch() {
   const [hasSearched, setHasSearched] = useState(false)
 
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const hasVoiceTriggered = useRef(false)
   const [audioLevel, setAudioLevel] = useState(0)
   const audioLevelInterval = useRef<NodeJS.Timeout | null>(null)
 
-  // ✅ Fix hydration bug: only access search params after mount
   useEffect(() => {
     if (typeof window !== "undefined") {
       const urlSearchParams = new URLSearchParams(window.location.search)
-      const query = urlSearchParams.get("query")
-
-      if (query) {
-        setQuery(query)
-        handleSearch(query, {
+      const initialQuery = urlSearchParams.get("query")
+      if (initialQuery) {
+        setQuery(initialQuery)
+        setHasSearched(true)
+        handleSearch(initialQuery, {
           cuisine: "",
           diet: "",
           includeIngredients: "",
@@ -58,7 +58,6 @@ export default function RecipeSearch() {
     }
   }, [])
 
-  // Setup speech recognition
   useEffect(() => {
     if (typeof window !== "undefined" && ("SpeechRecognition" in window || "webkitSpeechRecognition" in window)) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -69,19 +68,27 @@ export default function RecipeSearch() {
       recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
         const current = event.resultIndex
         const transcriptText = event.results[current][0].transcript
-        console.log("Heard:", transcriptText) 
         setTranscript(transcriptText)
 
         const lowerText = transcriptText.toLowerCase()
 
+        // 🛡️ Prevent multiple triggers per session
+        if (hasVoiceTriggered.current) return
+
         if (lowerText.includes("find me") || lowerText.includes("search for")) {
-          const searchQuery = lowerText.replace("find me", "").replace("search for", "").trim()
-          console.log("Triggering search for:",  searchQuery) // ✅
+          const searchQuery = lowerText
+            .replace("find me", "")
+            .replace("search for", "")
+            .replace("recipes", "")
+            .trim()
+
           if (searchQuery) {
+            hasVoiceTriggered.current = true
             setQuery(searchQuery)
             handleSearch(searchQuery, filters)
           }
         } else if (lowerText.includes("show my saved recipes") || lowerText.includes("go to saved recipes")) {
+          hasVoiceTriggered.current = true
           router.push("/saved")
         }
       }
@@ -116,12 +123,14 @@ export default function RecipeSearch() {
     if (isListening) {
       recognitionRef.current.stop()
       setIsListening(false)
+      hasVoiceTriggered.current = false // ✅ Reset voice trigger
       if (audioLevelInterval.current) {
         clearInterval(audioLevelInterval.current)
         audioLevelInterval.current = null
       }
     } else {
       setTranscript("")
+      hasVoiceTriggered.current = false
       recognitionRef.current.start()
       setIsListening(true)
 
@@ -146,11 +155,15 @@ export default function RecipeSearch() {
       return
     }
 
+    router.push(`?query=${encodeURIComponent(searchQuery)}`)
     setIsLoading(true)
+    setHasSearched(true)
+    setRecipes([])
+
     try {
       const results = await searchRecipes(searchQuery, searchFilters)
+      console.log("Results from API:", results)
       setRecipes(results)
-      setHasSearched(true)
 
       if (results.length === 0) {
         toast({
@@ -173,6 +186,9 @@ export default function RecipeSearch() {
   const handleFilterChange = (newFilters: typeof filters) => {
     setFilters(newFilters)
   }
+
+
+
 
   return (
     <div className="space-y-8">
@@ -355,6 +371,7 @@ export default function RecipeSearch() {
     </div>
   )
 }
+
 
 // "use client"
 
