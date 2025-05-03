@@ -53,23 +53,29 @@ export default function AnimatedHero() {
         </div>
 
         {/* Recipe image */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={commandIndex}
-            className="absolute inset-0 z-0"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Image
-              src={`/placeholder.svg?height=400&width=500&text=${encodeURIComponent(voiceCommands[commandIndex].split(" ").slice(0, 3).join(" "))}`}
-              alt="Recipe"
-              fill
-              className="object-cover"
-            />
-          </motion.div>
-        </AnimatePresence>
+<AnimatePresence mode="wait">
+  <motion.div
+    key={commandIndex}
+    className="absolute inset-0 z-0"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.5 }}
+  >
+    <Image
+      src="https://as2.ftcdn.net/v2/jpg/07/73/30/51/1000_F_773305184_X79YkW22zBAQoV6qgmkEZqNoZYPb3QfU.jpg"
+      alt="Recipe"
+      fill
+      className="object-cover"
+      priority
+    />
+    {/* Optional overlay caption */}
+    <div className="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-1 rounded text-sm">
+      {voiceCommands[commandIndex]?.split(" ").slice(0, 3).join(" ")}
+    </div>
+  </motion.div>
+</AnimatePresence>
+
 
         {/* Voice UI overlay */}
         <div className="absolute inset-x-0 bottom-0 p-4 z-40">
