@@ -45,15 +45,19 @@ export default function RecipeSearch() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const urlSearchParams = new URLSearchParams(window.location.search)
-      const initialQuery = urlSearchParams.get("query")
-      if (initialQuery) {
-        setQuery(initialQuery)
+      const initialQuery = urlSearchParams.get("query") || ""
+      const cuisine = urlSearchParams.get("cuisine") || ""
+      const diet = urlSearchParams.get("diet") || ""
+      const includeIngredients = urlSearchParams.get("includeIngredients") || ""
+
+      const initialFilters = { cuisine, diet, includeIngredients }
+
+      setQuery(initialQuery)
+      setFilters(initialFilters)
+
+      if (initialQuery || cuisine || diet || includeIngredients) {
         setHasSearched(true)
-        handleSearch(initialQuery, {
-          cuisine: "",
-          diet: "",
-          includeIngredients: "",
-        })
+        handleSearch(initialQuery, initialFilters)
       }
     }
   }, [])
@@ -72,7 +76,6 @@ export default function RecipeSearch() {
 
         const lowerText = transcriptText.toLowerCase()
 
-        // 🛡️ Prevent multiple triggers per session
         if (hasVoiceTriggered.current) return
 
         if (lowerText.includes("find me") || lowerText.includes("search for")) {
@@ -123,7 +126,7 @@ export default function RecipeSearch() {
     if (isListening) {
       recognitionRef.current.stop()
       setIsListening(false)
-      hasVoiceTriggered.current = false // ✅ Reset voice trigger
+      hasVoiceTriggered.current = false
       if (audioLevelInterval.current) {
         clearInterval(audioLevelInterval.current)
         audioLevelInterval.current = null
@@ -155,14 +158,21 @@ export default function RecipeSearch() {
       return
     }
 
-    router.push(`?query=${encodeURIComponent(searchQuery)}`)
+    const queryParams = new URLSearchParams()
+
+    if (searchQuery) queryParams.set("query", searchQuery)
+    if (searchFilters.cuisine) queryParams.set("cuisine", searchFilters.cuisine)
+    if (searchFilters.diet) queryParams.set("diet", searchFilters.diet)
+    if (searchFilters.includeIngredients) queryParams.set("includeIngredients", searchFilters.includeIngredients)
+
+    router.push(`?${queryParams.toString()}`)
+
     setIsLoading(true)
     setHasSearched(true)
     setRecipes([])
 
     try {
       const results = await searchRecipes(searchQuery, searchFilters)
-      console.log("Results from API:", results)
       setRecipes(results)
 
       if (results.length === 0) {
@@ -186,9 +196,6 @@ export default function RecipeSearch() {
   const handleFilterChange = (newFilters: typeof filters) => {
     setFilters(newFilters)
   }
-
-
-
 
   return (
     <div className="space-y-8">
