@@ -32,7 +32,7 @@
 ## 🌐 Live Demo
 
 👉 [Check out VoiceCook AI on Vercel](https://your-vercel-deploy-url.com)  
-*(Replace this with your actual deployed link)*
+
 
 ---
 
